@@ -28,8 +28,22 @@ export function BookCard({ book, onViewDetails, onRentRequest }: BookCardProps) 
     poor: 'Poor',
   };
 
-  const images = book.images ? JSON.parse(book.images) : [];
-  const primaryImage = images[0] || '/api/placeholder/300/400';
+  // Safely parse images with error handling
+  let images: string[] = [];
+  try {
+    if (book.images) {
+      if (typeof book.images === 'string') {
+        images = JSON.parse(book.images);
+      } else if (Array.isArray(book.images)) {
+        images = book.images;
+      }
+    }
+  } catch (error) {
+    console.warn('Failed to parse book images:', error);
+    images = [];
+  }
+  
+  const primaryImage = images[0] || 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=300&h=400&fit=crop';
 
   return (
     <Card className="group hover:shadow-lg transition-all duration-200 cursor-pointer">

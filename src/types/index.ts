@@ -26,7 +26,7 @@ export interface Book {
   pricePerDay: number;
   pricePerWeek?: number;
   pricePerMonth?: number;
-  images?: string[];
+  images?: string[] | string;
   isAvailable: boolean;
   location?: string;
   createdAt: string;

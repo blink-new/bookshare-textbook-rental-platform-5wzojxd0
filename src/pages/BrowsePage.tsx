@@ -45,16 +45,47 @@ export function BrowsePage({ onViewBook, onRentRequest }: BrowsePageProps) {
               where: { id: book.userId },
               limit: 1
             });
+            
+            // Safely parse images with error handling
+            let parsedImages: string[] = [];
+            try {
+              if (book.images) {
+                if (typeof book.images === 'string') {
+                  parsedImages = JSON.parse(book.images);
+                } else if (Array.isArray(book.images)) {
+                  parsedImages = book.images;
+                }
+              }
+            } catch (imageError) {
+              console.warn('Failed to parse book images for book:', book.id, imageError);
+              parsedImages = [];
+            }
+            
             return {
               ...book,
               owner: owner[0] || null,
-              images: book.images ? JSON.parse(book.images) : []
+              images: parsedImages
             };
           } catch (error) {
+            // Safely parse images with error handling (error case)
+            let parsedImages: string[] = [];
+            try {
+              if (book.images) {
+                if (typeof book.images === 'string') {
+                  parsedImages = JSON.parse(book.images);
+                } else if (Array.isArray(book.images)) {
+                  parsedImages = book.images;
+                }
+              }
+            } catch (imageError) {
+              console.warn('Failed to parse book images for book:', book.id, imageError);
+              parsedImages = [];
+            }
+            
             return {
               ...book,
               owner: null,
-              images: book.images ? JSON.parse(book.images) : []
+              images: parsedImages
             };
           }
         })
