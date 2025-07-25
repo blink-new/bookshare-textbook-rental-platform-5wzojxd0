@@ -51,14 +51,25 @@ export function BrowsePage({ onViewBook, onRentRequest }: BrowsePageProps) {
             try {
               if (book.images) {
                 if (typeof book.images === 'string') {
-                  parsedImages = JSON.parse(book.images);
+                  // Only parse if it looks like JSON (starts with [ or ")
+                  if (book.images.startsWith('[') || book.images.startsWith('"')) {
+                    parsedImages = JSON.parse(book.images);
+                  } else {
+                    // If it's a plain URL string, wrap it in an array
+                    parsedImages = [book.images];
+                  }
                 } else if (Array.isArray(book.images)) {
                   parsedImages = book.images;
                 }
               }
             } catch (imageError) {
               console.warn('Failed to parse book images for book:', book.id, imageError);
-              parsedImages = [];
+              // If parsing fails, try to use the raw string as a single image
+              if (typeof book.images === 'string' && book.images.startsWith('http')) {
+                parsedImages = [book.images];
+              } else {
+                parsedImages = [];
+              }
             }
             
             return {
@@ -72,14 +83,25 @@ export function BrowsePage({ onViewBook, onRentRequest }: BrowsePageProps) {
             try {
               if (book.images) {
                 if (typeof book.images === 'string') {
-                  parsedImages = JSON.parse(book.images);
+                  // Only parse if it looks like JSON (starts with [ or ")
+                  if (book.images.startsWith('[') || book.images.startsWith('"')) {
+                    parsedImages = JSON.parse(book.images);
+                  } else {
+                    // If it's a plain URL string, wrap it in an array
+                    parsedImages = [book.images];
+                  }
                 } else if (Array.isArray(book.images)) {
                   parsedImages = book.images;
                 }
               }
             } catch (imageError) {
               console.warn('Failed to parse book images for book:', book.id, imageError);
-              parsedImages = [];
+              // If parsing fails, try to use the raw string as a single image
+              if (typeof book.images === 'string' && book.images.startsWith('http')) {
+                parsedImages = [book.images];
+              } else {
+                parsedImages = [];
+              }
             }
             
             return {

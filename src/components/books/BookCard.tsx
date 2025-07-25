@@ -28,19 +28,27 @@ export function BookCard({ book, onViewDetails, onRentRequest }: BookCardProps) 
     poor: 'Poor',
   };
 
-  // Safely parse images with error handling
+  // Handle images - they should already be parsed as an array from BrowsePage
   let images: string[] = [];
-  try {
-    if (book.images) {
-      if (typeof book.images === 'string') {
-        images = JSON.parse(book.images);
-      } else if (Array.isArray(book.images)) {
-        images = book.images;
+  if (book.images) {
+    if (Array.isArray(book.images)) {
+      images = book.images;
+    } else if (typeof book.images === 'string') {
+      // Fallback: if somehow we get a string, try to parse it safely
+      try {
+        if (book.images.startsWith('[') || book.images.startsWith('"')) {
+          images = JSON.parse(book.images);
+        } else if (book.images.startsWith('http')) {
+          images = [book.images];
+        }
+      } catch (error) {
+        console.warn('Failed to parse book images in BookCard:', error);
+        // If it's a URL string, use it directly
+        if (book.images.startsWith('http')) {
+          images = [book.images];
+        }
       }
     }
-  } catch (error) {
-    console.warn('Failed to parse book images:', error);
-    images = [];
   }
   
   const primaryImage = images[0] || 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=300&h=400&fit=crop';

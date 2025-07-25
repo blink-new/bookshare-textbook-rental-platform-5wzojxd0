@@ -26,7 +26,7 @@ export interface Book {
   pricePerDay: number;
   pricePerWeek?: number;
   pricePerMonth?: number;
-  images?: string[] | string;
+  images?: string[]; // Should be an array of image URLs after parsing
   isAvailable: boolean;
   location?: string;
   createdAt: string;
