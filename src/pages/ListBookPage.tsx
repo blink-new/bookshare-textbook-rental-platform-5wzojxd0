@@ -9,7 +9,7 @@ const ListBookPage: React.FC = () => {
     author: '',
     isbn: '',
     subject: '',
-    condition: 'good',
+    condition: 'like_new',
     description: '',
     dailyRate: '',
     weeklyRate: '',
@@ -25,7 +25,8 @@ const ListBookPage: React.FC = () => {
   ];
 
   const conditions = [
-    { value: 'excellent', label: 'Excellent - Like new' },
+    { value: 'new', label: 'New - Brand new condition' },
+    { value: 'like_new', label: 'Like New - Excellent condition' },
     { value: 'good', label: 'Good - Minor wear' },
     { value: 'fair', label: 'Fair - Some wear' },
     { value: 'poor', label: 'Poor - Heavy wear' }
@@ -71,8 +72,10 @@ const ListBookPage: React.FC = () => {
         imageUrls.push(publicUrl);
       }
 
-      // Create book listing
+      // Create book listing with unique ID
+      const bookId = `book_${user.id}_${Date.now()}`;
       await blink.db.books.create({
+        id: bookId,
         title: formData.title,
         author: formData.author,
         isbn: formData.isbn || null,
@@ -91,14 +94,24 @@ const ListBookPage: React.FC = () => {
       
       // Reset form
       setFormData({
-        title: '', author: '', isbn: '', subject: '', condition: 'good',
+        title: '', author: '', isbn: '', subject: '', condition: 'like_new',
         description: '', dailyRate: '', weeklyRate: '', location: ''
       });
       setImages([]);
       
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error listing book:', error);
-      toast.error('Failed to list book. Please try again.');
+      
+      // Show more specific error messages
+      if (error?.message?.includes('409')) {
+        toast.error('A book with similar details already exists. Please check your listing.');
+      } else if (error?.message?.includes('400')) {
+        toast.error('Invalid book information. Please check all fields.');
+      } else if (error?.message?.includes('constraint')) {
+        toast.error('Invalid data format. Please check the condition and other fields.');
+      } else {
+        toast.error(`Failed to list book: ${error?.message || 'Please try again.'}`);
+      }
     } finally {
       setIsSubmitting(false);
     }
